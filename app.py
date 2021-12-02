@@ -29,9 +29,11 @@ def search():
 		destinationAirport = request.form.get('destinationAirport')
 		departureDate = request.form.get('departureDate')
 		arrivalDate = request.form.get('departureDate')
-		return request.form
-		#if (sourceCity == sourceAirport == destinationAirport == destinationCity == departureDate == arrivalDate == ""):
-		
+		if (sourceCity == sourceAirport == destinationAirport == destinationCity == departureDate == arrivalDate == ""):
+			flash("Enter at least one value.")
+			return render_template("search.html")
+		else:
+			
 	else:
 		return render_template("search.html")
 
@@ -42,7 +44,12 @@ def register():
 		#grabs information from the forms
 		username = request.form['username']
 		password = request.form['password']
+		password2 = request.form['password2']
 		user_type = request.form['user_type']
+
+		if (password != password2):
+			flash("Passwords don't match")
+			return render_template('register.html')
 
 		cursor = db.cursor()
 		error = None
@@ -59,7 +66,6 @@ def register():
 			#If the previous query returns data, then user exists
 			flash("This user already exists")
 			return render_template('register.html')
-
 		else:
 			if user_type == 'customer':
 				ins = 'INSERT INTO Customer VALUES(%s, %s)'

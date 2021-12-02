@@ -5,6 +5,16 @@
 	</head>
 	<body>
 		<center>
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		<ul>
+		{% for message in messages %}
+			<li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+		{% endwith %}
+		
 		<h1>Search Flights</h1>
 		<form action="/search" method="post">
 			<h2>Enter at least one of the following.</h2>
