@@ -40,7 +40,9 @@ def search():
 #Define route for register
 @app.route('/register', methods=['GET','POST'])
 def register():
-	if request.method == "POST":
+	return render_template('register.html')
+
+'''
 		#grabs information from the forms
 		username = request.form['username']
 		password = request.form['password']
@@ -75,8 +77,21 @@ def register():
 			db.commit()
 			cursor.close()
 			return render_template('index.html')
-	else: 
-		return render_template('register.html')
+			'''
+@app.route("/registerCustomer", methods=["GET", "POST"])
+def registerCustomer():
+	if request.method == "POST":
+		return "form stuff"
+	else:
+		return render_template("registerCustomer.html")
+
+@app.route("/registerStaff", methods=["GET", "POST"])
+def registerStaff():
+	if request.method == "POST":
+		return "form stuff"
+	else:
+		return render_template("registerStaff.html")
+
 
 #Define route for login
 @app.route('/login', methods=['GET','POST'])
