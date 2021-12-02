@@ -69,9 +69,10 @@ def register():
 		else:
 			if user_type == 'customer':
 				ins = 'INSERT INTO Customer VALUES(%s, %s)'
+				cursor.execute(ins, (username, password))
 			elif user_type == 'airlinestaff':
 				ins = 'INSERT INTO AirlineStaff VALUES(%s, %s)'
-			cursor.execute(ins, (username, password))
+				cursor.execute(ins, (username, password))
 			db.commit()
 			cursor.close()
 			return render_template('index.html')
