@@ -14,6 +14,7 @@ db = pymysql.connect(host='localhost',
 
 #setup database
 init()
+db.select_db('AirTicketSystem')
 
 @app.route("/")
 def index():
