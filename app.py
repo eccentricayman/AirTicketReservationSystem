@@ -32,7 +32,7 @@ def search():
 		if (sourceCity == sourceAirport == destinationAirport == destinationCity == departureDate == arrivalDate == ""):
 			flash("Enter at least one value.")
 			return render_template("search.html")
-		else:
+		#else:
 			
 	else:
 		return render_template("search.html")
@@ -101,11 +101,11 @@ def login():
 		
 		if (customerData):
 			session['username'] = username
-			session['user'] = 'Customer'
+			session['user_type'] = 'Customer'
 			return redirect(url_for('home'))
 		elif (airlineData):
 			session['username'] = username
-			session['user'] = 'AirlineStaff'
+			session['user_type'] = 'AirlineStaff'
 			return redirect(url_for('home'))
 		else:
 			error = 'Invalid login or username'
