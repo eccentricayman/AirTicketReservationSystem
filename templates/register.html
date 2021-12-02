@@ -4,7 +4,7 @@
 		<title>Register</title>
 	</head>
 	<body>
-		{% with messages as get_flashed_messages() %}
+		{% with messages = get_flashed_messages() %}
 		{% if messages %}
 		<ul>
 		{% for message in messages %}
