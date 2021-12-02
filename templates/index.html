@@ -4,6 +4,16 @@
 		<title>Airline Ticket Reservation System</title>
 	</head>
 	<body>
+		{% with messages as get_flashed_messages() %}
+		{% if messages %}
+		<ul>
+		{% for message in messages %}
+			<li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+		{% endwith %}
+		
 		<a href="/login">Login</a>
 		<a href="/register">Signup</a>
 		<a href="/search">Search Flights</a>

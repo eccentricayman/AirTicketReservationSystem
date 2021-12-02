@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, url_for, redirect
+from flask import Flask, render_template, request, session, url_for, redirect, flash
 import pymysql.cursors
 import os
 from init import *
@@ -29,6 +29,8 @@ def search():
 		destinationAirport = request.form.get('destinationAirport')
 		departureDate = request.form.get('departureDate')
 		arrivalDate = request.form.get('departureDate')
+		return request.form
+		#if (sourceCity == sourceAirport == destinationAirport == destinationCity == departureDate == arrivalDate == ""):
 		
 	else:
 		return render_template("search.html")
@@ -40,6 +42,7 @@ def register():
 		#grabs information from the forms
 		username = request.form['username']
 		password = request.form['password']
+		user_type = request.form['user_type']
 
 		cursor = db.cursor()
 		error = None
@@ -54,10 +57,14 @@ def register():
 		
 		if(customerData or airlineData):
 			#If the previous query returns data, then user exists
-			error = "This user already exists"
-			return render_template('register.html', error = error)
+			flash("This user already exists")
+			return render_template('register.html')
+
 		else:
-			ins = 'INSERT INTO user VALUES(%s, %s)'
+			if user_type == 'customer':
+				ins = 'INSERT INTO Customer VALUES(%s, %s)'
+			elif user_type == 'airlinestaff':
+				ins = 'INSERT INTO AirlineStaff VALUES(%s, %s)'
 			cursor.execute(ins, (username, password))
 			db.commit()
 			cursor.close()
