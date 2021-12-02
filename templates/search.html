@@ -1,0 +1,29 @@
+<html>
+	<head>
+		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
+		<title>Search Flights</title>
+	</head>
+	<body>
+		<center>
+		<h1>Search Flights</h1>
+		<form action="/search" method="post">
+			<h2>Enter at least one of the following.</h2>
+			<input type="text" name="sourceCity" placeholder="Source City" />
+			<br>
+			<input type="text" name="sourceAirport" placeholder="Source Airport" />
+			<br>
+			<input type="text" name="destinationCity" placeholder="Destination City" />
+			<br>
+			<input type="text" name="destinationAirport" placeholder="Destination Airport" />
+			<br>
+			<label for="departureDate">Departure Date: </label>
+			<input type="date" name="departureDate" id="departureDate" />
+			<br>
+			<label for="arrivalDate">Arrival Date: </label>
+			<input type="date" name="arrivalDate" id="arrivalDate" />
+			<br>
+			<input type="submit" value="Search" />
+		</form>
+		</center>
+	</body>
+</html>
