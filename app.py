@@ -168,6 +168,11 @@ def login():
 		#grabs information from the forms
 		username = request.form['username']
 		password = request.form['password']
+		password2 = request.form['password2']
+
+		if (password != password2):
+			flash("Passwords don't match")
+			return render_template('login.html')
 
 		cursor = db.cursor()
 		error = None
@@ -180,6 +185,10 @@ def login():
 		cursor.execute(airlineQuery, (username, password))
 		airlineData = cursor.fetchone()
 
+		debugQuery = 'SELECT * from Customer'
+		cursor.execute(debugQuery)
+		print(cursor.fetchone())
+
 		cursor.close()
 		
 		if (customerData):
@@ -191,8 +200,8 @@ def login():
 			session['user_type'] = 'AirlineStaff'
 			return redirect(url_for('home'))
 		else:
-			error = 'Invalid login or username'
-			return render_template('login.html', error=error)
+			flash("Invalid login or username")
+			return render_template('login.html')
 	else:
 		return render_template('login.html')
 
