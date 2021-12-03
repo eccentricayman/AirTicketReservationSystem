@@ -14,16 +14,16 @@
 		{% endif %}
 		{% endwith %}
 
-		
+		<h2>Customer Registration</h2>
 		<form action="/register" method="POST">
-			<input type="text" name = "name" placeholder="name" required/> </br>
-            <input type="text" name = "email" placeholder="email" required/> </br>
-			<input type="password" name = "password" placeholder="password" required/></br>
-			<input type="password" name = "password2" placeholder="confirm password" required/></br>
+            Email: <input type="text" name = "email" placeholder="email" required/> </br>
+			Password: <input type="password" name = "password" placeholder="password" required/></br>
+			Password: <input type="password" name = "password2" placeholder="confirm password" required/></br>
+            Name: <input type="text" name = "name" placeholder="name" required/> </br>
             Address <br>
-            <input type="text" name = "buildingNum" placeholder="Ex. 2749" /> </br>
-            <input type="text" name = "street" placeholder="Ex. Avenue A" /> </br>
-            <input type="text" name = "city" placeholder="Chicago" /> </br>
+            Building Number:<input type="text" name = "buildingNum" placeholder="Ex. 2749" /> </br>
+            Street: <input type="text" name = "street" placeholder="Ex. Avenue A" /> </br>
+            City: <input type="text" name = "city" placeholder="Chicago" /> </br>
             <!-- state -->
             <label for="state">State:</label>
             <select id="state" name="state">
@@ -77,15 +77,15 @@
                 <option value="WV">West Virgina</option>
                 <option value="WI">Wisconsin</option>
                 <option value="WY">Wyoming</option>
-            </select>
-            <input type="text" name = "PhoneNumber" placeholder="Ex. 7184562298" /> </br>
-            <input type="text" name = "PassportNumber" /> </br>
+            </select><br>
+            Phone Number: <input type="text" name = "PhoneNumber" placeholder="Ex. 7184562298" /> </br>
+            PassportNumber: <input type="text" name = "PassportNumber" placeholder="Ex.9327418AH"/> </br>
             <label for="passportExDate">Passport Expiration Date:</label>
-            <input type="date" id="passportExDate" name="passportExDate">
+            <input type="date" id="passportExDate" name="passportExDate"><br>
             <label for="dob">Date of Birth:</label>
             <input type="date" id="dob" name="dob">
             <input type="text" name = "passportCountry" placeholder="Ex. USA" /> </br>
-            
+
 			<input type="submit" value = Register />
 		</form>
 		<br>

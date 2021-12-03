@@ -14,17 +14,17 @@
 		{% endif %}
 		{% endwith %}
 
-		
+		<h2>Airline Staff Registration</h2>
 		<form action="/register" method="POST">
-			<input type="text" name = "username" placeholder="username" required/> </br>
-			<input type="password" name = "password" placeholder="password" required/></br>
-			<input type="password" name = "password2" placeholder="confirm password" required/></br>
-			<input type="text" name = "firstName" placeholder="firstName" required/> </br>
-            <input type="text" name = "lastName" placeholder="lastName" required/> </br>
+			Username: <input type="text" name = "username" placeholder="username" required/> </br>
+			Password: <input type="password" name = "password" placeholder="password" required/></br>
+			Password: <input type="password" name = "password2" placeholder="confirm password" required/></br>
+			First Name: <input type="text" name = "firstName" placeholder="firstName" required/> </br>
+            Last Name: <input type="text" name = "lastName" placeholder="lastName" required/> </br>
             <label for="dob">Date of Birth:</label>
             <input type="date" id="dob" name="dob">
-            <input type="text" name = "PhoneNumber" placeholder="Ex. 7184562298" /> </br>
-            <input type="text" name = "Airline" placeholder="Ex. SouthWest" /> </br>
+            Phone Number: <input type="text" name = "PhoneNumber" placeholder="Ex. 7184562298" /> </br>
+            Airline: <input type="text" name = "Airline" placeholder="Ex. SouthWest" /> </br>
 			<input type="submit" value = Register />
 		</form>
 		<br>
