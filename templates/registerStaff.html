@@ -14,21 +14,19 @@
 		{% endif %}
 		{% endwith %}
 
-		<a href="/registerCustomer">Register as a Customer</a>
-		<br>
-		<a href="/registerStaff">Register as Staff</a>
 		
-		<!-- <form action="/register" method="POST">
+		<form action="/register" method="POST">
 			<input type="text" name = "username" placeholder="username" required/> </br>
 			<input type="password" name = "password" placeholder="password" required/></br>
 			<input type="password" name = "password2" placeholder="confirm password" required/></br>
-			Type of User:
-			<input type="radio" id="customer" name="user_type" value="customer">
-			<label for="customer">Customer</label><br>
-			<input type="radio" id="airlinestaff" name="user_type" value="airlinestaff">
-			<label for="airlinestaff">AirlineStaff</label><br>
+			<input type="text" name = "firstName" placeholder="firstName" required/> </br>
+            <input type="text" name = "lastName" placeholder="lastName" required/> </br>
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob">
+            <input type="text" name = "PhoneNumber" placeholder="Ex. 7184562298" /> </br>
+            <input type="text" name = "Airline" placeholder="Ex. SouthWest" /> </br>
 			<input type="submit" value = Register />
-		</form> -->
+		</form>
 		<br>
 		<a href="/">Go back</a>
 	</body>
