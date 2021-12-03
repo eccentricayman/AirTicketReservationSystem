@@ -82,14 +82,81 @@ def register():
 @app.route("/registerCustomer", methods=["GET", "POST"])
 def registerCustomer():
 	if request.method == "POST":
-		return "form stuff"
+		username = request.form['username']
+		password = request.form['password']
+		password2 = request.form['password2']
+
+		if (password != password2):
+			flash("Passwords don't match")
+			return render_template('register.html')
+		
+		name = request.form['name']
+		buildingNum = request.form['buildingNum']
+		street = request.form['street']
+		city = request.form['city']
+		state = request.form['state']
+		PhoneNumber = request.form['PhoneNumber']
+		PassportNumber = request.form['PassportNumber']
+		passportExDate = request.form['passportExDate']
+		dob = request.form['dob']
+		passportCountry = request.form['passportCountry']
+
+		print(name,buildingNum,street,city,state,PhoneNumber,PassportNumber,passportExDate,dob,passportCountry)
+
+		cursor = db.cursor()
+		error = None
+
+		customerQuery = 'SELECT * FROM Customer WHERE email = %s'
+		cursor.execute(customerQuery, (username))
+		customerData = cursor.fetchone()
+		
+		if(customerData):
+			flash("This user already exists")
+			return render_template('register.html')
+		else:
+			ins = 'INSERT INTO Customer VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+			cursor.execute(ins, (name,username, password,buildingNum,street,city,state,PhoneNumber,PassportNumber,passportExDate,dob,passportCountry))
+			db.commit()
+			cursor.close()
+			return render_template('index.html')
 	else:
 		return render_template("registerCustomer.html")
 
 @app.route("/registerStaff", methods=["GET", "POST"])
 def registerStaff():
 	if request.method == "POST":
-		return "form stuff"
+		username = request.form['username']
+		password = request.form['password']
+		password2 = request.form['password2']
+
+		if (password != password2):
+			flash("Passwords don't match")
+			return render_template('register.html')
+
+		firstName = request.form['firstName']
+		lastName = request.form['lastName']
+		dob = request.form['dob']
+		phoneNumber = request.form['PhoneNumber']
+		airline = request.form['Airline']
+
+		print(firstName,lastName,dob,phoneNumber,airline)
+		
+		cursor = db.cursor()
+		error = None
+
+		airlineQuery = 'SELECT * FROM AirlineStaff WHERE username = %s'
+		cursor.execute(airlineQuery, (username))
+		airlineData = cursor.fetchone()
+		
+		if(airlineData):
+			flash("This user already exists")
+			return render_template('register.html')
+		else:
+			ins = 'INSERT INTO AirlineStaff VALUES(%s, %s, %s, %s, %s, %s, %s)'
+			cursor.execute(ins, (username, password,firstName,lastName,dob,phoneNumber,airline))
+			db.commit()
+			cursor.close()
+			return render_template('index.html')
 	else:
 		return render_template("registerStaff.html")
 
