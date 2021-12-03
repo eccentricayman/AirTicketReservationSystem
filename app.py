@@ -42,43 +42,6 @@ def search():
 def register():
 	return render_template('register.html')
 
-'''
-		#grabs information from the forms
-		username = request.form['username']
-		password = request.form['password']
-		password2 = request.form['password2']
-		user_type = request.form['user_type']
-
-		if (password != password2):
-			flash("Passwords don't match")
-			return render_template('register.html')
-
-		cursor = db.cursor()
-		error = None
-
-		customerQuery = 'SELECT * FROM Customer WHERE email = %s'
-		cursor.execute(customerQuery, (username))
-		customerData = cursor.fetchone()
-
-		airlineQuery = 'SELECT * FROM AirlineStaff WHERE username = %s'
-		cursor.execute(airlineQuery, (username))
-		airlineData = cursor.fetchone()
-		
-		if(customerData or airlineData):
-			#If the previous query returns data, then user exists
-			flash("This user already exists")
-			return render_template('register.html')
-		else:
-			if user_type == 'customer':
-				ins = 'INSERT INTO Customer VALUES(%s, %s)'
-				cursor.execute(ins, (username, password))
-			elif user_type == 'airlinestaff':
-				ins = 'INSERT INTO AirlineStaff VALUES(%s, %s)'
-				cursor.execute(ins, (username, password))
-			db.commit()
-			cursor.close()
-			return render_template('index.html')
-			'''
 @app.route("/registerCustomer", methods=["GET", "POST"])
 def registerCustomer():
 	if request.method == "POST":
