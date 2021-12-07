@@ -157,19 +157,43 @@ def login():
 		if (customerData):
 			session['username'] = username
 			session['user_type'] = 'Customer'
-			return redirect(url_for('home'))
+			return redirect(url_for('customerHome'))
 		elif (airlineData):
 			session['username'] = username
 			session['user_type'] = 'AirlineStaff'
-			return redirect(url_for('home'))
+			return redirect(url_for('staffHome'))
 		else:
 			flash("Invalid login or username")
 			return render_template('login.html')
 	else:
 		return render_template('login.html')
 
+@app.route('/customerHome', methods=['GET','POST'])
+def customerHome():
+	return render_template('customerHome.html')
 
+@app.route('/staffHome', methods=['GET','POST'])
+def staffHome():
+	return render_template('staffHome.html')
 
+@app.route("/viewFlights", methods=["GET", "POST"])
+def viewFlights():
+	cursor = db.cursor()
+	customerQuery = 'SELECT DISTINCT f.* from Ticket t join Flights f on t.flightNumber = f.flightNumber where customerEmail = %s and departureDateTime >= now()'
+	cursor.execute(customerQuery, (session['username']))
+	customerFlights = cursor.fetchall()
+	for item in customerFlights:
+		print(item)
+	return render_template('customerHome.html')
+
+@app.route("/rate", methods=["GET", "POST"])
+def rate():
+	cursor = db.cursor()
+	#check if the user previously took the flight
+	#insert their rating into table 
+	customerQuery = ''
+	cursor.execute(customerQuery, (session['username']))
+	return render_template('customerHome.html')
 
 if __name__ == "__main__":
 	app.debug = True

@@ -1,0 +1,35 @@
+<html>
+	<head>
+		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
+		<title>Register</title>
+	</head>
+	<body>
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		<ul>
+		{% for message in messages %}
+			<li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+		{% endwith %}
+
+		<a href="/registerCustomer">Register as a Customer</a>
+		<br>
+		<a href="/registerStaff">Register as Staff</a>
+		
+		<!-- <form action="/register" method="POST">
+			<input type="text" name = "username" placeholder="username" required/> </br>
+			<input type="password" name = "password" placeholder="password" required/></br>
+			<input type="password" name = "password2" placeholder="confirm password" required/></br>
+			Type of User:
+			<input type="radio" id="customer" name="user_type" value="customer">
+			<label for="customer">Customer</label><br>
+			<input type="radio" id="airlinestaff" name="user_type" value="airlinestaff">
+			<label for="airlinestaff">AirlineStaff</label><br>
+			<input type="submit" value = Register />
+		</form> -->
+		<br>
+		<a href="/">Go back</a>
+	</body>
+</html>

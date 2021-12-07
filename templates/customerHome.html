@@ -1,0 +1,28 @@
+<html>
+	<head>
+		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
+		<title>Register</title>
+	</head>
+	<body>
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		<ul>
+		{% for message in messages %}
+			<li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+		{% endwith %}
+
+		<a href="/viewFlights">View My Flights</a>
+		<br>
+		<a href="/search">Search For Flights</a>
+        <br>
+		<!-- <a href="/purchaseTickets">Purchase Tickets</a> -->
+		<a href="/rate">Rate or Comment on Previous Flights</a>
+        <br>
+		
+		<br>
+		<a href="/">Go back</a>
+	</body>
+</html>
