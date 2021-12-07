@@ -186,14 +186,30 @@ def viewFlights():
 		print(item)
 	return render_template('customerHome.html')
 
+@app.route("/purchaseTickets", methods=["GET", "POST"])
+def purchaseTickets():
+	cursor = db.cursor()
+	return render_template('customerHome.html')
+
+@app.route("/trackSpending", methods=["GET", "POST"])
+def rtrackSpendingate():
+	cursor = db.cursor()
+	return render_template('customerHome.html')
+
 @app.route("/rate", methods=["GET", "POST"])
 def rate():
 	cursor = db.cursor()
-	#check if the user previously took the flight
+	#check if the user previously took the flight - ask for flight number 
 	#insert their rating into table 
-	customerQuery = ''
-	cursor.execute(customerQuery, (session['username']))
+	#customerQuery = ''
+	#cursor.execute(customerQuery, (session['username']))
 	return render_template('customerHome.html')
+
+@app.route("/logout", methods=["GET", "POST"])
+def logout():
+	session['username'] = ''
+	return render_template('customerHome.html')
+
 
 if __name__ == "__main__":
 	app.debug = True
