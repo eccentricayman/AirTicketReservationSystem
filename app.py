@@ -31,9 +31,33 @@ def search():
 		arrivalDate = request.form.get('departureDate')
 		if (sourceCity == sourceAirport == destinationAirport == destinationCity == departureDate == arrivalDate == ""):
 			flash("Enter at least one value.")
-			return render_template("search.html")
-		#else:
-			
+			return redirect(url_for("search"))
+		else:
+			query = "SELECT * FROM flights WHERE "
+			inserts = []
+			if sourceCity != "":
+				query += "sourceCity = %s AND"
+				inserts.append(sourceCity)
+			if sourceAirport != "":
+				query += "sourceAirport = %s AND"
+				inserts.append(sourceAirport)
+			if destinationCity != "":
+				query += "destinationCity = %s AND"	
+				inserts.append(destinationCity)	
+			if destinationAirport != "":
+				query += "destinationAirport = %s AND"	
+				inserts.append(destinationAirport)
+			if departureDate != "":
+				query += "departureDate = %s AND"
+				inserts.append(departureDate)		
+			if arrivalDate != "":
+				query += "arrivalDate = %s AND"	
+				inserts.append(arrivalDate)	
+			query = query[:-3]
+			cursor = db.cursor()
+			cursor.execute(query, tuple(inserts))
+			data = cursor.fetchall()
+			return render_template("search.html", data = data)
 	else:
 		return render_template("search.html")
 
