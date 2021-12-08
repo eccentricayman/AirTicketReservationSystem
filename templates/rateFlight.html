@@ -1,0 +1,29 @@
+<html>
+	<head>
+		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
+		<title>Register</title>
+	</head>
+	<body>
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		<ul>
+		{% for message in messages %}
+			<li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+		{% endwith %}
+		
+		<form action="/register" method="POST">
+			<input type="text" name = "flightNumber" placeholder="flightNumber" required/> </br>
+            <label for="rate">Rate (between 0 and 5):</label> </br>
+            <input type="range" id="rate" name="rate" min="0" max="5">
+            <label for="comment">Comments:</label>
+            <textarea id="comment" name="comment" rows="4" cols="50">
+            </textarea> <br>
+			<input type="submit" value = Register/>
+		</form>
+		<br>
+		<a href="/">Go back</a>
+	</body>
+</html>

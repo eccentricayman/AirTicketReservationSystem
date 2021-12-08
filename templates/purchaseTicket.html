@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
+		<title>Register</title>
+	</head>
+	<body>
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		<ul>
+		{% for message in messages %}
+			<li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+		{% endwith %}
+		
+		<form action="/register" method="POST">
+			<input type="text" name = "flightNumber" placeholder="flightNumber" required/> </br>
+            <input type="radio" id="credit" name="creditOrDebit" value="credit">
+			<label for="credit">Credit</label><br>
+			<input type="radio" id="debit" name="creditOrDebit" value="debit">
+			<label for="debit">Debit</label><br>
+            <input type="password" name = "cardNumber" placeholder="cardNumber" required/></br>
+            <input type="text" name = "NameOnCard" placeholder="NameOnCard" required/> </br>
+            <input type="date" id="cardExp" name="CardExpirationDate"> <br>
+			<input type="submit" value = Register />
+		</form>
+		<br>
+		<a href="/">Go back</a>
+	</body>
+</html>

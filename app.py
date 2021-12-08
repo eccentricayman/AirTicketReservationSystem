@@ -182,33 +182,75 @@ def viewFlights():
 	customerQuery = 'SELECT DISTINCT f.* from Ticket t join Flights f on t.flightNumber = f.flightNumber where customerEmail = %s and departureDateTime >= now()'
 	cursor.execute(customerQuery, (session['username']))
 	customerFlights = cursor.fetchall()
+	#A display results to users 
 	for item in customerFlights:
 		print(item)
 	return render_template('customerHome.html')
 
 @app.route("/purchaseTickets", methods=["GET", "POST"])
 def purchaseTickets():
-	cursor = db.cursor()
-	return render_template('customerHome.html')
+	if request.method == "POST":
+		cursor = db.cursor()
+		#check if full check flights - airplaneId check number of seats 
+		flightNumber = request.form['flightNumber']
+		creditOrDebit = request.form['creditOrDebit']
+		cardNumber = request.form['cardNumber']
+		NameOnCard = request.form['NameOnCard']
+		cardExp = request.form['cardExp']
+
+		numSeatsQuery = 'SELECT a.seats, f.basePrice, f.airline from Flights f join Airplane a on a.airplaneId = f.airplaneId f.flightNumber = %s'
+		cursor.execute(numSeatsQuery, (flightNumber))
+		#A get the results of the query and store into NumSeats, BasePrice, airlineName (rn have dummy values of 1 n empty string)
+		numSeats = 1
+		basePrice = 1
+		airlineName = ""
+		if (numSeats == 0):
+			flash("No More Seats Avail")
+			return redirect(url_for("purchaseTicket"))
+		elif (numSeats < 15):
+			basePrice = basePrice*1.15
+		#insert into ticket table + get credit card info 
+		purchaseTicketQuery = 'INSERT into Tickets VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+		cursor.execute("SELECT NOW();")
+		timeRN = cursor.fetchone()
+		cursor.execute(purchaseTicketQuery, (str(numSeats), session['username'],airlineName,flightNumber,str(basePrice),str(timeRN),creditOrDebit,cardNumber,NameOnCard,cardExp))
+		db.commit()
+		cursor.close()
+		return redirect(url_for('purchaseTicket'))
+	else:
+		return render_template('purchaseTicket.html')
 
 @app.route("/trackSpending", methods=["GET", "POST"])
-def rtrackSpendingate():
+def trackSpending():
 	cursor = db.cursor()
+	#look at Ticket table n add up for the user (done)
+	#for the past year (?)
+	#a bar chart/table showing month wise money spent for last 6 months
+	#option to specify a range of dates and look at charts for specified time 
+	spendingQuery = 'Select sum(soldPrice) from Ticket where customerEmail = %s '
+	cursor.execute(spendingQuery, (session['username']))
 	return render_template('customerHome.html')
 
 @app.route("/rate", methods=["GET", "POST"])
 def rate():
+	flightNumber = request.form['flightNumber']
+	rate = request.form['rate']
+	comment = request.form['comment']
 	cursor = db.cursor()
-	#check if the user previously took the flight - ask for flight number 
-	#insert their rating into table 
+	checkFlightQuery = 'SELECT ticketID from Ticket where flightNumber = %s and customerEmail = %s'
+	cursor.execute(checkFlightQuery, (flightNumber,session['username']))
+
+	#check if the user previously took the flight - ask for flight number in Tickets db 
+	#insert their rating into table ViewPreviousFlights? 
 	#customerQuery = ''
 	#cursor.execute(customerQuery, (session['username']))
-	return render_template('customerHome.html')
+	return render_template('rateFlight.html')
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
-	session['username'] = ''
-	return render_template('customerHome.html')
+	del session['username']
+	del session['user_type']
+	return redirect(url_for(index))
 
 
 if __name__ == "__main__":
