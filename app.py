@@ -23,37 +23,31 @@ def index():
 @app.route("/search", methods=["GET", "POST"])
 def search():
 	if request.method == "POST":
-		sourceCity = request.form.get('sourceCity')
-		sourceAirport = request.form.get('sourceAirport')
-		destinationCity = request.form.get('destinationCity')
-		destinationAirport = request.form.get('destinationAirport')
+		departureAirport = request.form.get('departureAirport')
+		arrivalAirport = request.form.get('arrivalAirport')
 		departureDate = request.form.get('departureDate')
-		arrivalDate = request.form.get('departureDate')
-		if (sourceCity == sourceAirport == destinationAirport == destinationCity == departureDate == arrivalDate == ""):
+		arrivalDate = request.form.get('arrivalDate')
+		if (departureAirport == arrivalAirport == departureDate == arrivalDate == ""):
 			flash("Enter at least one value.")
 			return redirect(url_for("search"))
 		else:
 			query = "SELECT * FROM flights WHERE "
 			inserts = []
-			if sourceCity != "":
-				query += "sourceCity = %s AND"
-				inserts.append(sourceCity)
-			if sourceAirport != "":
-				query += "sourceAirport = %s AND"
-				inserts.append(sourceAirport)
-			if destinationCity != "":
-				query += "destinationCity = %s AND"	
-				inserts.append(destinationCity)	
-			if destinationAirport != "":
-				query += "destinationAirport = %s AND"	
-				inserts.append(destinationAirport)
+			if departureAirport != "":
+				query += "departureAirport = %s AND "
+				inserts.append(departureAirport)
+			if arrivalAirport != "":
+				query += "arrivalAirport = %s AND "	
+				inserts.append(arrivalAirport)
 			if departureDate != "":
-				query += "departureDate = %s AND"
-				inserts.append(departureDate)		
+				query += "departureDateTime = %s AND "
+				x = datetime.strptime(departureDate, '%Y-%m-%d')
+				inserts.append(x)
 			if arrivalDate != "":
-				query += "arrivalDate = %s AND"	
+				query += "arrivalDateTime = %s AND "	
 				inserts.append(arrivalDate)	
-			query = query[:-3]
+			query = query[:-4]
+			print(query)
 			cursor = db.cursor()
 			cursor.execute(query, tuple(inserts))
 			data = cursor.fetchall()
