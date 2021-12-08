@@ -247,28 +247,41 @@ def purchaseTickets():
 @app.route("/trackSpending", methods=["GET", "POST"])
 def trackSpending():
 	cursor = db.cursor()
-	#look at Ticket table n add up for the user (done)
-	#for the past year (?)
-	#a bar chart/table showing month wise money spent for last 6 months
+	#look at Ticket table n add up for the user (done) for the past year 
+	#a bar chart/table showing month wise money spent for last 6 months CURDATE() - INTERVAL 6 MONTH;
 	#option to specify a range of dates and look at charts for specified time 
-	spendingQuery = 'Select sum(soldPrice) from Ticket where customerEmail = %s '
+	spendingQuery = 'Select sum(soldPrice) from Ticket where customerEmail = %s and purchaseDateTime > dateadd(year, -1, now())'
 	cursor.execute(spendingQuery, (session['username']))
+	spendingSixMonthsQuery = ''
 	return render_template('customerHome.html')
 
 @app.route("/rate", methods=["GET", "POST"])
 def rate():
-	flightNumber = request.form['flightNumber']
-	rate = request.form['rate']
-	comment = request.form['comment']
-	cursor = db.cursor()
-	checkFlightQuery = 'SELECT ticketID from Ticket where flightNumber = %s and customerEmail = %s'
-	cursor.execute(checkFlightQuery, (flightNumber,session['username']))
-
 	#check if the user previously took the flight - ask for flight number in Tickets db 
 	#insert their rating into table ViewPreviousFlights? 
-	#customerQuery = ''
-	#cursor.execute(customerQuery, (session['username']))
-	return render_template('rateFlight.html')
+	if request.method == "POST":
+		flightNumber = request.form['flightNumber']
+		rate = request.form['rate']
+		comment = request.form['comment']
+		cursor = db.cursor()
+		checkFlightQuery = 'SELECT ticketID from Ticket where flightNumber = %s and customerEmail = %s'
+		cursor.execute(checkFlightQuery, (flightNumber,session['username']))
+		customerTicket = cursor.fetchone()
+		if (customerTicket is None):
+			flash("User didn't take flight")
+			return redirect(url_for('rate'))
+		else:
+			ins = 'INSERT INTO ViewPreviousFlights VALUES(%s, %s, %s, %s)'
+			cursor.execute(ins, (session['username'],flightNumber,rate,comment))
+			db.commit()
+			cursor.close()
+			return redirect(url_for('rate'))
+	else:
+		return render_template('rateFlight.html')
+
+
+	
+
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():

@@ -60,7 +60,6 @@ def init():
 		CREATE TABLE if not exists ViewFutureFlights (
 			email varchar(50),
 			flightNumber varchar(50),
-			departureDateTime datetime,
 			rate int,
 			comment varchar(200)
 		);
