@@ -1,11 +1,9 @@
 <html>
 	<head>
 		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
-		<title>Login</title>
+		<title>View Flights</title>
 	</head>
 	<body>
-		<a href="/">Go back</a>
-
 		{% with messages = get_flashed_messages() %}
 		{% if messages %}
 		<ul>
@@ -16,13 +14,15 @@
 		{% endif %}
 		{% endwith %}
 
-	<form action="/login" method="POST">
-		<input type="text" name = "username" placeholder="username" required/> </br>
-		<input type="password" name = "password" placeholder="password" required/></br>
-		<input type="submit" value = Login />
-	</form>
+		<a href="/customerHome">Back</a>
 
-</body>
+		<h1>Hello {{ session['username'] }}</h1>
 
-
+		<h2>Flights</h2>
+		<ul>
+			{% for flight in flights %}
+			<li>{{ flight }}</li>
+			{% endfor %}
+		</ul>
+	</body>
 </html>

@@ -20,6 +20,9 @@ db.select_db('AirTicketSystem')
 
 @app.route("/")
 def index():
+	print("\n\n\n")
+	print(session)
+	print("\n\n\n")
 	return render_template("index.html")
 
 @app.route("/search", methods=["GET", "POST"])
@@ -99,7 +102,9 @@ def registerCustomer():
 			return redirect(url_for("registerCustomer"))
 		else:
 			ins = 'INSERT INTO Customer VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-			cursor.execute(ins, (name,email, password,buildingNum,street,city,state,PhoneNumber,PassportNumber,passportExDate,dob,passportCountry))
+			encoded = password.encode()
+			hashedPW = hashlib.sha256(encoded).hexdigest()
+			cursor.execute(ins, (name,email, hashedPW,buildingNum,street,city,state,PhoneNumber,PassportNumber,passportExDate,dob,passportCountry))
 			db.commit()
 			cursor.close()
 			return redirect(url_for("index"))
@@ -154,11 +159,6 @@ def login():
 		#grabs information from the forms
 		username = request.form['username']
 		password = request.form['password']
-		password2 = request.form['password2']
-
-		if (password != password2):
-			flash("Passwords don't match")
-			return render_template('login.html')
 
 		encoded = password.encode()
 		hashedPW = hashlib.sha256(encoded).hexdigest()
@@ -190,13 +190,17 @@ def login():
 			return redirect(url_for('staffHome'))
 		else:
 			flash("Invalid login or username")
-			return render_template('login.html')
+			return render_template("login.html")
 	else:
 		return render_template('login.html')
 
 @app.route('/customerHome', methods=['GET','POST'])
 def customerHome():
-	return render_template('customerHome.html', username = session['username'])
+	if "username" in session and session['user_type'] == "Customer":
+		return render_template('customerHome.html', username = session['username'])
+	else:
+		flash("Not logged in.")
+		return redirect(url_for("index"))
 
 @app.route('/staffHome', methods=['GET','POST'])
 def staffHome():
@@ -204,14 +208,20 @@ def staffHome():
 
 @app.route("/viewFlights", methods=["GET", "POST"])
 def viewFlights():
-	cursor = db.cursor()
-	customerQuery = 'SELECT DISTINCT f.* from Ticket t join Flights f on t.flightNumber = f.flightNumber where customerEmail = %s and departureDateTime >= now()'
-	cursor.execute(customerQuery, (session['username']))
-	customerFlights = cursor.fetchall()
-	#A display results to users 
-	for item in customerFlights:
-		print(item)
-	return render_template('customerHome.html')
+	print(session)
+	if "username" in session and session['user_type'] == "Customer":
+		cursor = db.cursor()
+		customerQuery = 'SELECT DISTINCT f.* from Ticket t join Flights f on t.flightNumber = f.flightNumber where customerEmail = %s and departureDateTime >= now()'
+		cursor.execute(customerQuery, (session['username']))
+		customerFlights = cursor.fetchall()
+		#A display results to users 
+		if customerFlights != []:
+			for item in customerFlights:
+				print(item)
+		return render_template('viewFlights.html', flights = customerFlights)
+	else:
+		flash("Not logged in.")
+		return redirect(url_for("index"))
 
 @app.route("/purchaseTickets", methods=["GET", "POST"])
 def purchaseTickets():

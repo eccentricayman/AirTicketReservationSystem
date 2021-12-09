@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
-		<title>Register</title>
+		<title>Home</title>
 	</head>
 	<body>
 		{% with messages = get_flashed_messages() %}
@@ -14,7 +14,7 @@
 		{% endif %}
 		{% endwith %}
 
-		<h1>Hello {username}</h1>
+		<h1>Hello {{ session['username'] }}</h1>
 
 		<a href="/viewFlights">View My Flights</a>
 		<br>

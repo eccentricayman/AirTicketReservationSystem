@@ -18,7 +18,7 @@ def init():
 		CREATE TABLE if not exists Customer (
 			name varchar(50),
 			email varchar(50),
-			password varchar(50),
+			password varchar(256),
 			buildingNumber bigint,
 			street varchar(50),
 			city varchar(50),
@@ -86,7 +86,7 @@ def init():
 
 		CREATE TABLE if not exists AirlineStaff (
 			username varchar(40),
-			password varchar(30),
+			password varchar(256),
 			firstName varchar(30),
 			lastName varchar(30),
 			dateOfBirth date,
