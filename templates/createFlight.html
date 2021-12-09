@@ -1,0 +1,46 @@
+<html>
+	<head>
+		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
+		<title>Create Flight</title>
+	</head>
+	<body>
+		<a href="/">Go Back</a>
+
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		<ul>
+		{% for message in messages %}
+			<li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+		{% endwith %}
+
+	<form action="/createFlight" method="POST">
+		<input type="text" name="flightNumber" placeholder="Flight Number" />
+		<br>
+		<label for="departureDateTime">Departure Date & Time:</label>
+		<input type="datetime-local" name="departureDateTime" id="departureDateTime" />
+		<br>
+		<label for="arrivalDateTime">Arrival Date & Time:</label>
+		<input type="datetime-local" name="arrivalDateTime" id="arrivalDateTime" />
+		<br>
+		<input type="text" name="airline" placeholder="Airline" />
+		<br>
+		<input type="number" name="basePrice" placeholder="Base Price" step=0.01 />
+		<br>
+		<input type="text" name="departureAirport" placeholder="Base Price" step=0.01 />
+		<input type="submit" value = "Create Flight" />
+	</form>
+
+	<ul>
+	{% if flights %}
+	{% for flight in flights %}
+	<li>{{ flight }}</li>
+	{% endfor %}
+	</ul>
+	{% endif %}
+</body>
+
+
+</html>

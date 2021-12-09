@@ -210,16 +210,55 @@ def staffHome():
 
 @app.route("/viewFlights", methods=["GET", "POST"])
 def viewFlights():
-	if "username" in session and session['user_type'] == "Customer":
+	#customer usecase 4
+	if "username" in session:
+		if session['user_type'] == "Customer":
+			cursor = db.cursor()
+			customerQuery = 'SELECT DISTINCT f.* from Ticket t join Flights f on t.flightNumber = f.flightNumber where customerEmail = %s and departureDateTime >= now()'
+			cursor.execute(customerQuery, (session['username']))
+			customerFlights = cursor.fetchall()
+			#A display results to users 
+			if customerFlights != []:
+				for item in customerFlights:
+					print(item)
+			return render_template('viewFlights.html', flights = customerFlights)
+		#staff usecase 4
+		elif session["user_type"] == "AirlineStaff":
+			cursor = db.cursor()
+			airlineQuery = "SELECT airline FROM AirlineStaff where username = %s"
+			cursor.execute(airlineQuery, (session['username']))
+			airline = cursor.fetchone()
+			staffQuery = 'SELECT * FROM Flights WHERE airline = %s'
+			cursor.execute(staffQuery, (airline))
+			airlineFlights = cursor.fetchall()
+			#A display results to users 
+			#if customerFlights != []:
+			#	for item in customerFlights:
+			#		print(item)
+			return render_template('viewFlights.html', flights = airlineFlights)
+	else:
+		flash("Not logged in.")
+		return redirect(url_for("index"))
+
+#airlinestaff usecase 5
+@app.route("/createFlight", methods = ["GET", "POST"])
+def createFlight():
+	if "username" in session and session['user_type'] == "AirlineStaff":
 		cursor = db.cursor()
-		customerQuery = 'SELECT DISTINCT f.* from Ticket t join Flights f on t.flightNumber = f.flightNumber where customerEmail = %s and departureDateTime >= now()'
-		cursor.execute(customerQuery, (session['username']))
-		customerFlights = cursor.fetchall()
-		#A display results to users 
-		if customerFlights != []:
-			for item in customerFlights:
-				print(item)
-		return render_template('viewFlights.html', flights = customerFlights)
+		airlineQuery = "SELECT airline FROM AirlineStaff where username = %s"
+		cursor.execute(airlineQuery, (session['username']))
+		airline = cursor.fetchone()
+		staffQuery = 'SELECT * FROM Flights WHERE airline = %s'
+		cursor.execute(staffQuery, (airline))
+		airlineFlights = cursor.fetchall()
+
+		if request.method == "POST":
+			#'%Y-%m-%d %H:%M:%S'
+
+			flash("Flight Created.")
+			return render_template("createFlight.html", flights = airlineFlights)
+		else:
+			return render_template("createFlight.html", flights = airlineFlights)
 	else:
 		flash("Not logged in.")
 		return redirect(url_for("index"))
@@ -243,9 +282,9 @@ def purchaseTickets():
 			print("\n\n")
 			print(data)
 			print("\n\n")
-			numSeats = data["a.seats"]
-			basePrice = data["f.basePrice"]
-			airlineName = data["f.airline"]
+			numSeats = data["seats"]
+			basePrice = data["basePrice"]
+			airlineName = data["airline"]
 			if (numSeats == 0):
 				flash("No More Seats Avail")
 				return redirect(url_for("purchaseTicket"))

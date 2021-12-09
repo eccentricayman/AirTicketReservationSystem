@@ -19,10 +19,12 @@
 		<h1>Hello {{ session['username'] }}</h1>
 
 		<h2>Flights</h2>
+		{% if flights %}
 		<ul>
 			{% for flight in flights %}
 			<li>{{ flight }}</li>
 			{% endfor %}
 		</ul>
+		{% endif %}
 	</body>
 </html>
