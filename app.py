@@ -291,7 +291,7 @@ def purchaseTickets():
 			elif (numSeats < 15):
 				basePrice = basePrice*1.15 #scam customer
 			#insert into ticket table + get credit card info 
-			purchaseTicketQuery = 'INSERT into Tickets VALUES(%s, %s, %s, %s, %s, now(), %s, %s, %s, %s)'
+			purchaseTicketQuery = 'INSERT into Ticket VALUES(%s, %s, %s, %s, %s, now(), %s, %s, %s, %s)'
 			print("LOOKING FOR")
 			print(purchaseTicketQuery, (str(numSeats), session['username'],airlineName,flightNumber,str(basePrice),creditOrDebit,cardNumber,NameOnCard,cardExp))
 			cursor.execute(purchaseTicketQuery, (str(numSeats), session['username'],airlineName,flightNumber,str(basePrice),creditOrDebit,cardNumber,NameOnCard,cardExp))
