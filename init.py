@@ -57,13 +57,6 @@ def init():
 			comment varchar(200)
 		);
 
-		CREATE TABLE if not exists ViewFutureFlights (
-			email varchar(50),
-			flightNumber varchar(50),
-			rate int,
-			comment varchar(200)
-		);
-
 		CREATE TABLE if not exists Purchase (
 			ticketID varchar(30),
 			email varchar(50)
@@ -77,11 +70,6 @@ def init():
 			airplaneId varchar(50),
 			seats int,
 			airline varchar(30)
-		);
-
-		CREATE TABLE if not exists AddAirplane (
-			airplaneId varchar(50),
-			username varchar(40)
 		);
 
 		CREATE TABLE if not exists AirlineStaff (
@@ -118,7 +106,6 @@ def init():
 
 		CREATE TABLE if not exists FlightStatus (
 			flightNumber varchar(50),
-			departureDateTime datetime,
 			username varchar(50),
 			status varchar(30)
 		);

@@ -275,6 +275,77 @@ def createFlight():
 		flash("Not logged in.")
 		return redirect(url_for("index"))
 
+#airlienstaff usecase 6
+@app.route("/changeStatus", methods = ["GET", "POST"])
+def changeStatus():
+	if "username" in session and session['user_type'] == "AirlineStaff":
+		if request.method == "POST":
+			flightNumber = request.form.get("flightNumber")
+			status = request.form.get("status")
+
+			cursor = db.cursor()
+			cursor.execute("INSERT INTO FlightStatus VALUES (%s, %s, %s)", (flightNumber, session['username'], status))
+			db.commit()
+
+			flash("Flight status changed.")
+			return render_template("changeStatus.html")
+		else:
+			return render_template("changeStatus.html")
+	else:
+		flash("Not logged in.")
+		return redirect(url_for("index"))
+
+#airlinestaff usecase 7
+@app.route("/addPlane", methods = ["GET", "POST"])
+def addPlane():
+	if "username" in session and session['user_type'] == "AirlineStaff":
+		cursor = db.cursor()
+		airlineQuery = "SELECT * FROM Airplane where username = %s"
+		cursor.execute(airlineQuery, (session['username']))
+		airline = cursor.fetchone()['airline']
+		staffQuery = 'SELECT * FROM Airplane WHERE airline = %s'
+		cursor.execute(staffQuery, (airline))
+		airlinePlanes = cursor.fetchall()
+
+		if request.method == "POST":
+			airplaneId = request.form.get("airplaneId")
+			seats = request.form.get("seats")
+			airline = request.form.get("airline")
+
+			cursor.execute("INSERT INTO Airplane VALUES (%s, %s, %s)", (airplaneId, seats, airline))
+			db.commit()
+
+			flash("Airplane Created.")
+			return render_template("addPlane.html", planes = airlinePlanes)
+		else:
+			return render_template("createFlight.html", planes = airlinePlanes)
+	else:
+		flash("Not logged in.")
+		return redirect(url_for("index"))
+
+#airlinestaff usecase 8
+@app.route("/addPlane", methods = ["GET", "POST"])
+def addPlane():
+	if "username" in session and session['user_type'] == "AirlineStaff":
+		if request.method == "POST":
+			airportID = request.form.get("airportID")
+			name = request.form.get("name")
+			city = request.form.get("city")
+
+			cursor = db.cursor()
+			cursor.execute("INSERT INTO Airport VALUES (%s, %s, %s)", (airportID, name, city))
+			db.commit()
+
+			flash("Airport Created.")
+			return render_template("addAirport.html")
+		else:
+			return render_template("addAirport.html")
+	else:
+		flash("Not logged in.")
+		return redirect(url_for("index"))
+
+#airlinestaff usecase 9 
+
 @app.route("/purchaseTickets", methods=["GET", "POST"])
 def purchaseTickets():
 	if "username" in session and session['user_type'] == "Customer":
