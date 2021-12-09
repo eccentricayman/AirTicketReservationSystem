@@ -14,9 +14,14 @@
 		{% endif %}
 		{% endwith %}
 
-		<a href="/registerCustomer">Register as a Customer</a>
+		<h1>Hello, {{ session['username'] }}</h1>
+		<a href="/viewFlights">View Flights for Airline</a>
 		<br>
-		<a href="/registerStaff">Register as Staff</a>
+		<a href="/createFlight">Create Flights</a>
+		<br>
+
+
+		<a href="/logout">Logout</a>
 		
 		<!-- <form action="/register" method="POST">
 			<input type="text" name = "username" placeholder="username" required/> </br>
