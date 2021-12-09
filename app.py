@@ -368,7 +368,7 @@ def rate():
 def logout():
 	del session['username']
 	del session['user_type']
-	return redirect(url_for(index))
+	return redirect(url_for("index"))
 
 
 if __name__ == "__main__":
