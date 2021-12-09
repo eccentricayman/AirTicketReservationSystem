@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, session, url_for, redirect, f
 import pymysql.cursors
 import os
 from init import *
+from datetime import datetime
+import hashlib
 
 app = Flask(__name__)
 app.secret_key = os.urandom(32)
@@ -41,11 +43,12 @@ def search():
 				inserts.append(arrivalAirport)
 			if departureDate != "":
 				query += "departureDateTime = %s AND "
-				x = datetime.strptime(departureDate, '%Y-%m-%d')
-				inserts.append(x)
+				convertedDateTime = datetime.strptime(departureDate, '%Y-%m-%d')
+				inserts.append(convertedDateTime)
 			if arrivalDate != "":
 				query += "arrivalDateTime = %s AND "	
-				inserts.append(arrivalDate)	
+				convertedDateTime = datetime.strptime(arrivalDate, '%Y-%m-%d')
+				inserts.append(convertedDateTime)	
 			query = query[:-4]
 			print(query)
 			cursor = db.cursor()
@@ -134,7 +137,9 @@ def registerStaff():
 			return redirect(url_for("registerStaff"))
 		else:
 			ins = 'INSERT INTO AirlineStaff VALUES(%s, %s, %s, %s, %s, %s, %s)'
-			cursor.execute(ins, (username, password,firstName,lastName,dob,phoneNumber,airline))
+			encoded = password.encode()
+			hashedPW = hashlib.sha256(encoded).hexdigest()
+			cursor.execute(ins, (username, hashedPW,firstName,lastName,dob,phoneNumber,airline))
 			db.commit()
 			cursor.close()
 			return redirect(url_for('index'))
@@ -155,15 +160,18 @@ def login():
 			flash("Passwords don't match")
 			return render_template('login.html')
 
+		encoded = password.encode()
+		hashedPW = hashlib.sha256(encoded).hexdigest()
+
 		cursor = db.cursor()
 		error = None
 
 		customerQuery = 'SELECT * FROM Customer WHERE email = %s and password = %s'
-		cursor.execute(customerQuery, (username, password))
+		cursor.execute(customerQuery, (username, hashedPW))
 		customerData = cursor.fetchone()
 
 		airlineQuery = 'SELECT * FROM AirlineStaff WHERE username = %s and password = %s'
-		cursor.execute(airlineQuery, (username, password))
+		cursor.execute(airlineQuery, (username, hashedPW))
 		airlineData = cursor.fetchone()
 
 		debugQuery = 'SELECT * from Customer'
@@ -188,7 +196,7 @@ def login():
 
 @app.route('/customerHome', methods=['GET','POST'])
 def customerHome():
-	return render_template('customerHome.html')
+	return render_template('customerHome.html', username = session['username'])
 
 @app.route('/staffHome', methods=['GET','POST'])
 def staffHome():
@@ -244,10 +252,12 @@ def trackSpending():
 	#look at Ticket table n add up for the user (done) for the past year 
 	#a bar chart/table showing month wise money spent for last 6 months CURDATE() - INTERVAL 6 MONTH;
 	#option to specify a range of dates and look at charts for specified time 
-	spendingQuery = 'Select sum(soldPrice) from Ticket where customerEmail = %s and purchaseDateTime > dateadd(year, -1, now())'
+	spendingQuery = 'SELECT sum(soldPrice) from Ticket where customerEmail = %s and purchaseDateTime > dateadd(year, -1, now())'
 	cursor.execute(spendingQuery, (session['username']))
-	spendingSixMonthsQuery = ''
-	return render_template('customerHome.html')
+	totalSpentOneYear = cursor.fetchone()
+	spendingSixMonthsQuery = 'SELECT MONTH(purchaseDateTime) AS Purchase_Month, sum(soldPrice) AS monthlySpent from Ticket where customerEmail = %s and purchaseDateTime > (SELECT CURDATE() - INTERVAL 6 MONTH) GROUP BY MONTH(purchaseDateTime);'
+	cursor.execute(spendingSixMonthsQuery, (session['username']))
+	return render_template('userSpending.html')
 
 @app.route("/rate", methods=["GET", "POST"])
 def rate():
