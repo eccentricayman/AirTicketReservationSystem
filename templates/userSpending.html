@@ -17,6 +17,16 @@
 		{% endif %}
 		{% endwith %}
 
+		<form action="/trackSpending" method="POST">
+			<label for="start">Starting Date: </label>
+			<input type="date" name="start" />
+			<br>
+			<label for="end">Ending Date: </label>
+			<input type="date" name="end" />
+			<br>
+			<input type="submit" value="Specify Range" />
+		</form>
+
 		<canvas id="myChart" style="width:100%;max-width:600px"></canvas>
 
 
