@@ -1,10 +1,12 @@
 <html>
 	<head>
 		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
-		<title>Register</title>
+		<title>Spending</title>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 	</head>
 	<body>
+		<a href="/">Go back</a>
+		{{spending}}
 		{% with messages = get_flashed_messages() %}
 		{% if messages %}
 		<ul>
@@ -40,7 +42,5 @@ new Chart("myChart", {
   }
 });
 </script>
-        <br>
-		<a href="/">Go back</a>
 	</body>
 </html>

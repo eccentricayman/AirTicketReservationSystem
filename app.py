@@ -268,16 +268,21 @@ def purchaseTickets():
 
 @app.route("/trackSpending", methods=["GET", "POST"])
 def trackSpending():
-	cursor = db.cursor()
-	#look at Ticket table n add up for the user (done) for the past year 
-	#a bar chart/table showing month wise money spent for last 6 months CURDATE() - INTERVAL 6 MONTH;
-	#option to specify a range of dates and look at charts for specified time 
-	spendingQuery = 'SELECT sum(soldPrice) from Ticket where customerEmail = %s and purchaseDateTime > dateadd(year, -1, now())'
-	cursor.execute(spendingQuery, (session['username']))
-	totalSpentOneYear = cursor.fetchone()
-	spendingSixMonthsQuery = 'SELECT MONTH(purchaseDateTime) AS Purchase_Month, sum(soldPrice) AS monthlySpent from Ticket where customerEmail = %s and purchaseDateTime > (SELECT CURDATE() - INTERVAL 6 MONTH) GROUP BY MONTH(purchaseDateTime);'
-	cursor.execute(spendingSixMonthsQuery, (session['username']))
-	return render_template('userSpending.html')
+	if "username" in session and session['user_type'] == "Customer":
+		cursor = db.cursor()
+		#look at Ticket table n add up for the user (done) for the past year 
+		#a bar chart/table showing month wise money spent for last 6 months CURDATE() - INTERVAL 6 MONTH;
+		#option to specify a range of dates and look at charts for specified time 
+		spendingQuery = 'SELECT sum(soldPrice) from Ticket where customerEmail = %s and purchaseDateTime > date_add(now(), INTERVAL -1 YEAR)'
+		cursor.execute(spendingQuery, (session['username']))
+		totalSpentOneYear = cursor.fetchone()
+		spendingSixMonthsQuery = 'SELECT MONTH(purchaseDateTime) AS Purchase_Month, sum(soldPrice) AS monthlySpent from Ticket where customerEmail = %s and purchaseDateTime > (SELECT CURDATE() - INTERVAL 6 MONTH) GROUP BY MONTH(purchaseDateTime);'
+		cursor.execute(spendingSixMonthsQuery, (session['username']))
+		spendingData = cursor.fetchall()
+		return render_template('userSpending.html', spending = spendingData)
+	else:
+		flash("Not logged in.")
+		return redirect(url_for("index"))
 
 @app.route("/rate", methods=["GET", "POST"])
 def rate():
