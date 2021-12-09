@@ -247,13 +247,25 @@ def createFlight():
 		cursor = db.cursor()
 		airlineQuery = "SELECT airline FROM AirlineStaff where username = %s"
 		cursor.execute(airlineQuery, (session['username']))
-		airline = cursor.fetchone()
+		airline = cursor.fetchone()['airline']
 		staffQuery = 'SELECT * FROM Flights WHERE airline = %s'
 		cursor.execute(staffQuery, (airline))
 		airlineFlights = cursor.fetchall()
 
 		if request.method == "POST":
-			#'%Y-%m-%d %H:%M:%S'
+			flightNumber = request.form.get("flightNumber")
+			departureDateTime = datetime.strptime(request.form.get("departureDateTime", '%Y-%m-%dT%H:%M'))
+			departureDateTimeSQL = datetime.strftime('%Y-%m-%d %H:%M:%S')
+			airline = request.form.get("airline")
+			arrivalAirport = request.form.get("arrivalAirport")
+			basePrice = request.form.get("basePrice")
+			arrivalDateTime = datetime.strptime(request.form.get("arrivalDateTime", '%Y-%m-%dT%H:%M'))
+			arrivalDateTimeSQL = datetime.strftime('%Y-%m-%d %H:%M:%S')
+			departureAirport = request.form.get("departureAirport")
+			airplaneId = request.form.get("airplaneId")
+
+			cursor.execute("INSERT INTO Flights VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (flightNumber, departureDateTimeSQL, airline, arrivalAirport, basePrice, arrivalDateTimeSQL, departureAirport, airplaneId))
+			db.commit()
 
 			flash("Flight Created.")
 			return render_template("createFlight.html", flights = airlineFlights)
