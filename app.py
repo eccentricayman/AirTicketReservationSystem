@@ -282,9 +282,9 @@ def purchaseTickets():
 			print("\n\n")
 			print(data)
 			print("\n\n")
-			numSeats = data["seats"]
-			basePrice = data["basePrice"]
-			airlineName = data["airline"]
+			numSeats = data[0]["seats"]
+			basePrice = data[0]["basePrice"]
+			airlineName = data[0]["airline"]
 			if (numSeats == 0):
 				flash("No More Seats Avail")
 				return redirect(url_for("purchaseTicket"))
