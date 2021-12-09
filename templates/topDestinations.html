@@ -1,0 +1,13 @@
+<html>
+	<head>
+		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
+		<title>Top Destinations</title>
+	</head>
+	<body>
+		<h1>Top Destinations for Past 3 Months</h1>
+		<h2>${{ monthlyTopDest }}</h2>
+		<br>
+		<h1>Top Destinations for Past Year</h1>
+		<h2>${{ yearlyTopDest }}</h2>
+	</body>
+</html>

@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
+		<title>View Ratings</title>
+	</head>
+	<body>
+		<a href="/">Go Back</a>
+
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		<ul>
+		{% for message in messages %}
+			<li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+		{% endwith %}
+
+	<form action="/viewRatings" method="POST">
+		<input type="number" name="flightID" placeholder="Flight ID" />
+		<br>
+		<input type="submit" value = "View Ratings" />
+	</form>
+
+	{% if avg %}
+	<h2>Average Rating: {{avg}}</h2>
+	{% endif %}
+	{% if comments %}
+	<ul>
+	{% for comment in comments %}
+		<li>{{ comment }}</li>
+	{% endfor %}
+	</ul>
+	{% endif %}
+</body>
+
+
+</html>

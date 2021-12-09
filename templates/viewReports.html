@@ -1,0 +1,73 @@
+<html>
+	<head>
+		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
+		<title>View Reports</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+	</head>
+	<body>
+		<a href="/">Go back</a>
+		{{spending}}
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		<ul>
+		{% for message in messages %}
+			<li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+		{% endwith %}
+
+		<h1>Filter Ranges for Ticket Sales</h1>
+		<form action="/viewReports" method="POST">
+			<label for="start">Starting Date:</label>
+			<input type="date" name="start"/>
+			<br>
+			<label for="end">Ending Date:</label>
+			<input type="date" name="end" />
+			<br>
+			<input type="submit" value="Query" />
+		</form>
+
+		{% if total %}
+		<h1>Total Sold in Range</h1>
+		<h2> {{ total }}</h2>
+		{% endif %}
+
+		{% if spending %}
+		<canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+		{% endif %}
+
+<script> 
+var xValues = [];
+var yValues = [];
+var barColors = ["red", "green","blue","orange","brown","grey"];
+{% for spenderoni in spending %}
+    xValues.push({{ spenderoni['Purchase_Month']}} )
+    yValues.push({{ spenderoni['Ticket_Count'] }})
+{% endfor %}
+console.log("LOOK FOR ME")
+console.log(xValues)
+console.log(yValues)
+
+
+
+new Chart("myChart", {
+  type: "bar",
+  data: {
+    labels: xValues,
+    datasets: [{
+      backgroundColor: barColors,
+      data: yValues
+    }]
+  },
+  options: {
+    legend: {display: false},
+    title: {
+      display: true,
+      text: "Amount Spent on Tickets Monthly Past Few Months"
+    }
+  }
+});
+</script>
+	</body>
+</html>

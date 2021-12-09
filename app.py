@@ -189,6 +189,10 @@ def login():
 		elif (airlineData):
 			session['username'] = username
 			session['user_type'] = 'AirlineStaff'
+			cursor = db.cursor()
+			airlineQuery = "SELECT airline FROM AirlineStaff where username = %s"
+			cursor.execute(airlineQuery, (session['username']))
+			session['airline'] = cursor.fetchone()['airline']
 			return redirect(url_for('staffHome'))
 		else:
 			flash("Invalid login or username")
@@ -225,11 +229,8 @@ def viewFlights():
 		#staff usecase 4
 		elif session["user_type"] == "AirlineStaff":
 			cursor = db.cursor()
-			airlineQuery = "SELECT airline FROM AirlineStaff where username = %s"
-			cursor.execute(airlineQuery, (session['username']))
-			airline = cursor.fetchone()
 			staffQuery = 'SELECT * FROM Flights WHERE airline = %s'
-			cursor.execute(staffQuery, (airline))
+			cursor.execute(staffQuery, (session['airline']))
 			airlineFlights = cursor.fetchall()
 			#A display results to users 
 			#if customerFlights != []:
@@ -245,11 +246,8 @@ def viewFlights():
 def createFlight():
 	if "username" in session and session['user_type'] == "AirlineStaff":
 		cursor = db.cursor()
-		airlineQuery = "SELECT airline FROM AirlineStaff where username = %s"
-		cursor.execute(airlineQuery, (session['username']))
-		airline = cursor.fetchone()['airline']
 		staffQuery = 'SELECT * FROM Flights WHERE airline = %s'
-		cursor.execute(staffQuery, (airline))
+		cursor.execute(staffQuery, (session['airline']))
 		airlineFlights = cursor.fetchall()
 
 		if request.method == "POST":
@@ -300,11 +298,8 @@ def changeStatus():
 def addPlane():
 	if "username" in session and session['user_type'] == "AirlineStaff":
 		cursor = db.cursor()
-		airlineQuery = "SELECT * FROM Airplane where username = %s"
-		cursor.execute(airlineQuery, (session['username']))
-		airline = cursor.fetchone()['airline']
 		staffQuery = 'SELECT * FROM Airplane WHERE airline = %s'
-		cursor.execute(staffQuery, (airline))
+		cursor.execute(staffQuery, (session['airline']))
 		airlinePlanes = cursor.fetchall()
 
 		if request.method == "POST":
@@ -324,8 +319,8 @@ def addPlane():
 		return redirect(url_for("index"))
 
 #airlinestaff usecase 8
-@app.route("/addPlane", methods = ["GET", "POST"])
-def addPlane():
+@app.route("/addAirport", methods = ["GET", "POST"])
+def addAirport():
 	if "username" in session and session['user_type'] == "AirlineStaff":
 		if request.method == "POST":
 			airportID = request.form.get("airportID")
@@ -345,6 +340,114 @@ def addPlane():
 		return redirect(url_for("index"))
 
 #airlinestaff usecase 9 
+@app.route("/viewRatings", methods = ["GET", "POST"])
+def viewRatings():
+	if "username" in session and session['user_type'] == "AirlineStaff":
+		if request.method == "POST":
+			flightID = request.form.get("flightID")
+
+			cursor = db.cursor()
+			cursor.execute("SELECT AVG(rate) FROM ViewPreviousFlights WHERE FlightNumber = %s GROUP BY FlightNumber", (flightID))
+			avg = cursor.fetchone()
+
+			cursor.execute("SELECT comment FROM ViewPreviousFlights WHERE FlightNumber = %s", (flightID))
+			comments = cursor.fetchall()
+
+			return render_template("viewRatings.html", avg = avg, comments = comments)
+		else:
+			return render_template("viewRatings.html")
+	else:
+		flash("Not logged in.")
+		return redirect(url_for("index"))
+
+#airlinestaff usecase 11
+@app.route("/viewFrequent", methods = ["GET", "POST"])
+def viewFrequent():
+	if "username" in session and session['user_type'] == "AirlineStaff":
+		if request.method == "POST":
+			email = request.form.get("email")
+
+			cursor = db.cursor()
+			cursor.execute("SELECT customerEmail, count(customerEmail) from Ticket ORDER BY count(customerEmail) LIMIT 1")
+			most = cursor.fetchone()
+
+			cursor.execute("SELECT flightNumber FROM Ticket WHERE customerEmail = %s AND airlineName = (SELECT airline FROM AirlineStaff WHERE username = %s)", (email, session['username']))
+			flights = cursor.fetchall()
+
+			return render_template("viewFrequent.html", most = most, flights = flights)
+		else:
+			return render_template("viewFrequent.html")
+	else:
+		flash("Not logged in.")
+		return redirect(url_for("index"))
+
+#airlinestaff usecase 12
+@app.route("/viewReports", methods = ["GET", "POST"])
+def viewReports():
+	if "username" in session and session['user_type'] == "AirlineStaff":
+		if request.method == "POST":
+			start = request.form.get("start")
+			end = request.form.get("end")
+
+			cursor = db.cursor()
+			cursor.execute("SELECT count(ticketID) FROM Ticket WHERE (purchaseDateTime BETWEEN %s AND %s);", (start, end))
+			total = cursor.fetchall()
+
+			cursor.execute('''SELECT MONTH(purchaseDateTime) AS 
+			Purchase_Month ,count(ticketID) AS Ticket_Count
+			FROM Ticket
+			WHERE airlineName = %s and (purchaseDateTime BETWEEN %s AND %s)
+			GROUP BY MONTH(purchaseDateTime)
+			ORDER BY MONTH(purchaseDateTime);
+			''', (session['airline'], start, end))
+			spending = cursor.fetchall()
+
+			return render_template("viewReports.html", total = total, spending = spending)
+		else:
+			return render_template("viewReports.html")
+	else:
+		flash("Not logged in.")
+		return redirect(url_for("index"))
+
+#airlinestaff usecase 13
+@app.route("/totalRevenue")
+def totalRevenue():
+	if "username" in session and session['user_type'] == "AirlineStaff":
+		cursor = db.cursor()
+		cursor.execute("SELECT sum(soldPrice) FROM Ticket WHERE airline = %s AND purchaseDateTime > date_add(now(), INTERVAL -1 MONTH);", (session['airline']))
+		monthly = cursor.fetchall()
+		cursor.execute("SELECT sum(soldPrice) FROM Ticket WHERE airline = %s AND purchaseDateTime > date_add(now(), INTERVAL -1 YEAR);", (session['airline']))
+		yearly = cursor.fetchall()
+		return render_template("totalRevenue.html", monthlyRevenue = monthly, yearlyRevenue = yearly)
+	else:
+		flash("Not logged in.")
+		return redirect(url_for("index"))
+
+#airlinestaff usecase 14
+@app.route("/topDestinations")
+def topDestinations():
+	if "username" in session and session['user_type'] == "AirlineStaff":
+		cursor = db.cursor()
+		cursor.execute('''
+		SELECT distinct a.city
+		FROM Ticket t 
+		join Flights f on t.flightNumber = f.flightNumber
+		join Airport a on f.arrivalAirport = a.name
+		where purchaseDateTime > date_add(now(), INTERVAL -3 MONTH)
+		limit 3;''')
+		monthly = cursor.fetchall()
+		cursor.execute('''
+		SELECT distinct a.city
+		FROM Ticket t 
+		join Flights f on t.flightNumber = f.flightNumber
+		join Airport a on f.arrivalAirport = a.name
+		where purchaseDateTime > date_add(now(), INTERVAL -1 YEAR)
+		limit 3;''')
+		yearly = cursor.fetchall()
+		return render_template("totalRevenue.html", monthlyRevenue = monthly, yearlyRevenue = yearly)
+	else:
+		flash("Not logged in.")
+		return redirect(url_for("index"))
 
 @app.route("/purchaseTickets", methods=["GET", "POST"])
 def purchaseTickets():
@@ -438,6 +541,8 @@ def rate():
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
 	del session['username']
+	if session['user_type'] == "AirlineStaff":
+		del session['airline']
 	del session['user_type']
 	return redirect(url_for("index"))
 

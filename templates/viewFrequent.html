@@ -1,0 +1,39 @@
+<html>
+	<head>
+		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
+		<title>View Frequent</title>
+	</head>
+	<body>
+		<a href="/">Go Back</a>
+
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		<ul>
+		{% for message in messages %}
+			<li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+		{% endwith %}
+
+	<form action="/viewFrequent" method="POST">
+		<input type="email" name="email" placeholder="Email" />
+		<br>
+		<input type="submit" value = "View Flights" />
+	</form>
+
+	{% if most %}
+	<h2>Most Frequent Flier: {{ most }}</h2>
+	{% endif %}
+
+	{% if flights %}
+	<ul>
+	{% for flight in flights %}
+		<li>{{ flight }}</li>
+	{% endfor %}
+	</ul>
+	{% endif %}
+</body>
+
+
+</html>
