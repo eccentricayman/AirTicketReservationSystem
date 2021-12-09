@@ -234,9 +234,9 @@ def purchaseTickets():
 			creditOrDebit = request.form['creditOrDebit']
 			cardNumber = request.form['cardNumber']
 			NameOnCard = request.form['NameOnCard']
-			cardExp = request.form['cardExp']
+			cardExp = request.form['CardExpirationDate']
 
-			numSeatsQuery = 'SELECT a.seats, f.basePrice, f.airline from Flights f join Airplane a on a.airplaneId = f.airplaneId f.flightNumber = %s'
+			numSeatsQuery = 'SELECT a.seats, f.basePrice, f.airline from Flights f join Airplane a on a.airplaneId = f.airplaneId where f.flightNumber = %s'
 			cursor.execute(numSeatsQuery, (flightNumber))
 			data = cursor.fetchall()
 			#A get the results of the query and store into NumSeats, BasePrice, airlineName (rn have dummy values of 1 n empty string)
