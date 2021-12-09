@@ -327,7 +327,7 @@ def trackSpending():
 		spendingQuery = 'SELECT sum(soldPrice) from Ticket where customerEmail = %s and purchaseDateTime > date_add(now(), INTERVAL -1 YEAR)'
 		cursor.execute(spendingQuery, (session['username']))
 		totalSpentOneYear = cursor.fetchone()
-		spendingSixMonthsQuery = 'SELECT MONTH(purchaseDateTime) AS Purchase_Month, sum(soldPrice) AS monthlySpent from Ticket where customerEmail = %s and purchaseDateTime > (SELECT CURDATE() - INTERVAL 6 MONTH) GROUP BY MONTH(purchaseDateTime);'
+		spendingSixMonthsQuery = 'SELECT MONTH(purchaseDateTime) AS Purchase_Month, sum(soldPrice) AS monthlySpent from Ticket where customerEmail = %s and purchaseDateTime > (SELECT CURDATE() - INTERVAL 6 MONTH) GROUP BY MONTH(purchaseDateTime) ORDER BY MONTH(purchaseDateTime);'
 		cursor.execute(spendingSixMonthsQuery, (session['username']))
 		spendingData = cursor.fetchall()
 		return render_template('userSpending.html', spending = spendingData)
