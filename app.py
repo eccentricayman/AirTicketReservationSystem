@@ -253,7 +253,7 @@ def purchaseTickets():
 				basePrice = basePrice*1.15 #scam customer
 			#insert into ticket table + get credit card info 
 			purchaseTicketQuery = 'INSERT into Tickets VALUES(%s, %s, %s, %s, %s, now(), %s, %s, %s, %s)'
-			print("LOOKING FOR THIS")
+			print("LOOKING FOR")
 			print(purchaseTicketQuery, (str(numSeats), session['username'],airlineName,flightNumber,str(basePrice),creditOrDebit,cardNumber,NameOnCard,cardExp))
 			cursor.execute(purchaseTicketQuery, (str(numSeats), session['username'],airlineName,flightNumber,str(basePrice),creditOrDebit,cardNumber,NameOnCard,cardExp))
 			db.commit()
@@ -283,28 +283,29 @@ def trackSpending():
 def rate():
 	#check if the user previously took the flight - ask for flight number in Tickets db 
 	#insert their rating into table ViewPreviousFlights? 
-	if request.method == "POST":
-		flightNumber = request.form['flightNumber']
-		rate = request.form['rate']
-		comment = request.form['comment']
-		cursor = db.cursor()
-		checkFlightQuery = 'SELECT ticketID from Ticket where flightNumber = %s and customerEmail = %s'
-		cursor.execute(checkFlightQuery, (flightNumber,session['username']))
-		customerTicket = cursor.fetchone()
-		if (customerTicket is None):
-			flash("User didn't take flight")
-			return redirect(url_for('rate'))
+	if "username" in session and session['user_type'] == "Customer":
+		if request.method == "POST":
+			flightNumber = request.form['flightNumber']
+			rate = request.form['rate']
+			comment = request.form['comment']
+			cursor = db.cursor()
+			checkFlightQuery = 'SELECT ticketID from Ticket where flightNumber = %s and customerEmail = %s'
+			cursor.execute(checkFlightQuery, (flightNumber,session['username']))
+			customerTicket = cursor.fetchone()
+			if (customerTicket is None):
+				flash("User didn't take flight")
+				return redirect(url_for('rate'))
+			else:
+				ins = 'INSERT INTO ViewPreviousFlights VALUES(%s, %s, %s, %s)'
+				cursor.execute(ins, (session['username'],flightNumber,rate,comment))
+				db.commit()
+				cursor.close()
+				return redirect(url_for('rate'))
 		else:
-			ins = 'INSERT INTO ViewPreviousFlights VALUES(%s, %s, %s, %s)'
-			cursor.execute(ins, (session['username'],flightNumber,rate,comment))
-			db.commit()
-			cursor.close()
-			return redirect(url_for('rate'))
+			return render_template('rateFlight.html')
 	else:
-		return render_template('rateFlight.html')
-
-
-	
+		flash("Not logged in.")
+		return redirect(url_for("index"))
 
 
 @app.route("/logout", methods=["GET", "POST"])
