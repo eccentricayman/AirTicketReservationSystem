@@ -20,9 +20,11 @@ db.select_db('AirTicketSystem')
 
 @app.route("/")
 def index():
-	print("\n\n\n")
-	print(session)
-	print("\n\n\n")
+	if "username" in session:
+		if session["user_type"] == "Customer":
+			return redirect(url_for("customerHome"))
+		elif session["user_type"] == "AirlineStaff":
+			return redirect(url_for("staffHome"))
 	return render_template("index.html")
 
 @app.route("/search", methods=["GET", "POST"])
@@ -208,7 +210,6 @@ def staffHome():
 
 @app.route("/viewFlights", methods=["GET", "POST"])
 def viewFlights():
-	print(session)
 	if "username" in session and session['user_type'] == "Customer":
 		cursor = db.cursor()
 		customerQuery = 'SELECT DISTINCT f.* from Ticket t join Flights f on t.flightNumber = f.flightNumber where customerEmail = %s and departureDateTime >= now()'
@@ -225,36 +226,45 @@ def viewFlights():
 
 @app.route("/purchaseTickets", methods=["GET", "POST"])
 def purchaseTickets():
-	if request.method == "POST":
-		cursor = db.cursor()
-		#check if full check flights - airplaneId check number of seats 
-		flightNumber = request.form['flightNumber']
-		creditOrDebit = request.form['creditOrDebit']
-		cardNumber = request.form['cardNumber']
-		NameOnCard = request.form['NameOnCard']
-		cardExp = request.form['cardExp']
+	if "username" in session and session['user_type'] == "Customer":
+		if request.method == "POST":
+			cursor = db.cursor()
+			#check if full check flights - airplaneId check number of seats 
+			flightNumber = request.form['flightNumber']
+			creditOrDebit = request.form['creditOrDebit']
+			cardNumber = request.form['cardNumber']
+			NameOnCard = request.form['NameOnCard']
+			cardExp = request.form['cardExp']
 
-		numSeatsQuery = 'SELECT a.seats, f.basePrice, f.airline from Flights f join Airplane a on a.airplaneId = f.airplaneId f.flightNumber = %s'
-		cursor.execute(numSeatsQuery, (flightNumber))
-		#A get the results of the query and store into NumSeats, BasePrice, airlineName (rn have dummy values of 1 n empty string)
-		numSeats = 1
-		basePrice = 1
-		airlineName = ""
-		if (numSeats == 0):
-			flash("No More Seats Avail")
-			return redirect(url_for("purchaseTicket"))
-		elif (numSeats < 15):
-			basePrice = basePrice*1.15
-		#insert into ticket table + get credit card info 
-		purchaseTicketQuery = 'INSERT into Tickets VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-		cursor.execute("SELECT NOW();")
-		timeRN = cursor.fetchone()
-		cursor.execute(purchaseTicketQuery, (str(numSeats), session['username'],airlineName,flightNumber,str(basePrice),str(timeRN),creditOrDebit,cardNumber,NameOnCard,cardExp))
-		db.commit()
-		cursor.close()
-		return redirect(url_for('purchaseTicket'))
+			numSeatsQuery = 'SELECT a.seats, f.basePrice, f.airline from Flights f join Airplane a on a.airplaneId = f.airplaneId f.flightNumber = %s'
+			cursor.execute(numSeatsQuery, (flightNumber))
+			data = cursor.fetchall()
+			#A get the results of the query and store into NumSeats, BasePrice, airlineName (rn have dummy values of 1 n empty string)
+			print("\n\n")
+			print(data)
+			print("\n\n")
+			numSeats = data["a.seats"]
+			basePrice = data["f.basePrice"]
+			airlineName = data["f.airline"]
+			if (numSeats == 0):
+				flash("No More Seats Avail")
+				return redirect(url_for("purchaseTicket"))
+			elif (numSeats < 15):
+				basePrice = basePrice*1.15 #scam customer
+			#insert into ticket table + get credit card info 
+			purchaseTicketQuery = 'INSERT into Tickets VALUES(%s, %s, %s, %s, %s, now(), %s, %s, %s, %s)'
+			print("LOOKING FOR THIS")
+			print(purchaseTicketQuery, (str(numSeats), session['username'],airlineName,flightNumber,str(basePrice),creditOrDebit,cardNumber,NameOnCard,cardExp))
+			cursor.execute(purchaseTicketQuery, (str(numSeats), session['username'],airlineName,flightNumber,str(basePrice),creditOrDebit,cardNumber,NameOnCard,cardExp))
+			db.commit()
+			cursor.close()
+			flash("Ticket purchased.")
+			return redirect(url_for('customerHome'))
+		else:
+			return render_template('purchaseTicket.html')
 	else:
-		return render_template('purchaseTicket.html')
+		flash("Not logged in.")
+		return redirect(url_for("index"))
 
 @app.route("/trackSpending", methods=["GET", "POST"])
 def trackSpending():
