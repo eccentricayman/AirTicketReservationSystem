@@ -18,13 +18,28 @@
 
 		<h1>Hello {{ session['username'] }}</h1>
 
-		<h2>Flights</h2>
-		{% if flights %}
+		{% if futureFlights %}
+		<h2>Future Flights</h2>
 		<ul>
-			{% for flight in flights %}
+			{% for flight in futureFlights %}
 			<li>{{ flight }}</li>
 			{% endfor %}
 		</ul>
+		{% else %}
+		<h2>No future flights.</h2>
+		{% endif %}
+
+		<br>
+
+		{% if allFlights %}
+		<h2>All Flights</h2>
+		<ul>
+			{% for flight in allFlights %}
+			<li>{{ flight }}</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+		<h2>No flights.</h2>
 		{% endif %}
 	</body>
 </html>

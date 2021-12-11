@@ -6,7 +6,6 @@
 	</head>
 	<body>
 		<a href="/">Go back</a>
-		{{spending}}
 		{% with messages = get_flashed_messages() %}
 		{% if messages %}
 		<ul>
@@ -30,7 +29,7 @@
 
 		{% if total %}
 		<h1>Total Sold in Range</h1>
-		<h2> {{ total }}</h2>
+		<h2> {{ total[0]['count(ticketID)'] }}</h2>
 		{% endif %}
 
 		{% if spending %}

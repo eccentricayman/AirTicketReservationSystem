@@ -218,14 +218,14 @@ def viewFlights():
 	if "username" in session:
 		if session['user_type'] == "Customer":
 			cursor = db.cursor()
-			customerQuery = 'SELECT DISTINCT f.* from Ticket t join Flights f on t.flightNumber = f.flightNumber where customerEmail = %s and departureDateTime >= now()'
+			futureQuery = 'SELECT DISTINCT f.* from Ticket t join Flights f on t.flightNumber = f.flightNumber where customerEmail = %s and departureDateTime >= now()'
+			cursor.execute(futureQuery, (session['username']))
+			futureFlights = cursor.fetchall()
+			#all flights
+			customerQuery = 'SELECT DISTINCT f.* from Ticket t join Flights f on t.flightNumber = f.flightNumber where customerEmail = %s'
 			cursor.execute(customerQuery, (session['username']))
-			customerFlights = cursor.fetchall()
-			#A display results to users 
-			if customerFlights != []:
-				for item in customerFlights:
-					print(item)
-			return render_template('viewFlights.html', flights = customerFlights)
+			allFlights = cursor.fetchall()
+			return render_template('viewFlights.html', futureFlights = futureFlights, allFlights = allFlights)
 		#staff usecase 4
 		elif session["user_type"] == "AirlineStaff":
 			cursor = db.cursor()
@@ -252,13 +252,13 @@ def createFlight():
 
 		if request.method == "POST":
 			flightNumber = request.form.get("flightNumber")
-			departureDateTime = datetime.strptime(request.form.get("departureDateTime", '%Y-%m-%dT%H:%M'))
-			departureDateTimeSQL = datetime.strftime('%Y-%m-%d %H:%M:%S')
+			departureDateTime = datetime.strptime(request.form.get("departureDateTime"), '%Y-%m-%dT%H:%M')
+			departureDateTimeSQL = departureDateTime.strftime('%Y-%m-%d %H:%M:%S')
 			airline = request.form.get("airline")
 			arrivalAirport = request.form.get("arrivalAirport")
 			basePrice = request.form.get("basePrice")
-			arrivalDateTime = datetime.strptime(request.form.get("arrivalDateTime", '%Y-%m-%dT%H:%M'))
-			arrivalDateTimeSQL = datetime.strftime('%Y-%m-%d %H:%M:%S')
+			arrivalDateTime = datetime.strptime(request.form.get("arrivalDateTime"), '%Y-%m-%dT%H:%M')
+			arrivalDateTimeSQL = arrivalDateTime.strftime('%Y-%m-%d %H:%M:%S')
 			departureAirport = request.form.get("departureAirport")
 			airplaneId = request.form.get("airplaneId")
 
@@ -282,7 +282,7 @@ def changeStatus():
 			status = request.form.get("status")
 
 			cursor = db.cursor()
-			cursor.execute("INSERT INTO FlightStatus VALUES (%s, %s, %s)", (flightNumber, session['username'], status))
+			cursor.execute("UPDATE FlightStatus SET status = %s WHERE flightNumber = %s", (status, flightNumber))
 			db.commit()
 
 			flash("Flight status changed.")
@@ -313,7 +313,7 @@ def addPlane():
 			flash("Airplane Created.")
 			return render_template("addPlane.html", planes = airlinePlanes)
 		else:
-			return render_template("createFlight.html", planes = airlinePlanes)
+			return render_template("addPlane.html", planes = airlinePlanes)
 	else:
 		flash("Not logged in.")
 		return redirect(url_for("index"))
@@ -364,19 +364,23 @@ def viewRatings():
 @app.route("/viewFrequent", methods = ["GET", "POST"])
 def viewFrequent():
 	if "username" in session and session['user_type'] == "AirlineStaff":
+		cursor = db.cursor()
+		cursor.execute("SELECT customerEmail, count(customerEmail) from Ticket GROUP BY customerEmail ORDER BY count(customerEmail) LIMIT 1")
+		most = cursor.fetchone()
+		print("\n\n\n\n")
+		print(most)
+		print("length: ")
+		print(len(most))
+		print("\n\n\n\n")
 		if request.method == "POST":
 			email = request.form.get("email")
-
-			cursor = db.cursor()
-			cursor.execute("SELECT customerEmail, count(customerEmail) from Ticket ORDER BY count(customerEmail) LIMIT 1")
-			most = cursor.fetchone()
 
 			cursor.execute("SELECT flightNumber FROM Ticket WHERE customerEmail = %s AND airlineName = (SELECT airline FROM AirlineStaff WHERE username = %s)", (email, session['username']))
 			flights = cursor.fetchall()
 
 			return render_template("viewFrequent.html", most = most, flights = flights)
 		else:
-			return render_template("viewFrequent.html")
+			return render_template("viewFrequent.html", most = most)
 	else:
 		flash("Not logged in.")
 		return redirect(url_for("index"))
@@ -414,9 +418,9 @@ def viewReports():
 def totalRevenue():
 	if "username" in session and session['user_type'] == "AirlineStaff":
 		cursor = db.cursor()
-		cursor.execute("SELECT sum(soldPrice) FROM Ticket WHERE airline = %s AND purchaseDateTime > date_add(now(), INTERVAL -1 MONTH);", (session['airline']))
+		cursor.execute("SELECT sum(soldPrice) FROM Ticket WHERE airlineName = %s AND purchaseDateTime > date_add(now(), INTERVAL -1 MONTH);", (session['airline']))
 		monthly = cursor.fetchall()
-		cursor.execute("SELECT sum(soldPrice) FROM Ticket WHERE airline = %s AND purchaseDateTime > date_add(now(), INTERVAL -1 YEAR);", (session['airline']))
+		cursor.execute("SELECT sum(soldPrice) FROM Ticket WHERE airlineName = %s AND purchaseDateTime > date_add(now(), INTERVAL -1 YEAR);", (session['airline']))
 		yearly = cursor.fetchall()
 		return render_template("totalRevenue.html", monthlyRevenue = monthly, yearlyRevenue = yearly)
 	else:
@@ -444,7 +448,8 @@ def topDestinations():
 		where purchaseDateTime > date_add(now(), INTERVAL -1 YEAR)
 		limit 3;''')
 		yearly = cursor.fetchall()
-		return render_template("totalRevenue.html", monthlyRevenue = monthly, yearlyRevenue = yearly)
+
+		return render_template("topDestinations.html", monthlyTopDest = monthly, yearlyTopDest = yearly)
 	else:
 		flash("Not logged in.")
 		return redirect(url_for("index"))
@@ -495,10 +500,10 @@ def purchaseTickets():
 def trackSpending():
 	if "username" in session and session['user_type'] == "Customer":
 		cursor = db.cursor()
-		if request.form == "POST":
+		if request.method == "POST":
 			start = request.form.get("start")
 			end = request.form.get("end")
-			cursor.execute('''SELECT MONTH(purchaseDateTime) AS Purchase_Month, sum(soldPrice) AS monthlySpent from Ticket where customerEmail = %s and (purchaseDateTime BETWEEN %s and %s) ORDER BY MONTH(purchaseDateTime);''', (session['username'], start, end))
+			cursor.execute('''SELECT MONTH(purchaseDateTime) AS Purchase_Month, sum(soldPrice) AS monthlySpent from Ticket where customerEmail = %s and (purchaseDateTime BETWEEN %s and %s) GROUP BY MONTH(purchaseDateTime) ORDER BY MONTH(purchaseDateTime);''', (session['username'], start, end))
 			spendingData = cursor.fetchall()
 			return render_template('userSpending.html', spending = spendingData)
 		else:

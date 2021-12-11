@@ -1,13 +1,14 @@
-gi<html>
+<html>
 	<head>
 		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
 		<title>Total Revenue</title>
 	</head>
 	<body>
+		<a href="/">Go Back</a>
 		<h1>Total Revenue for Last Month</h1>
-		<h2>${{ monthlyRevenue }}</h2>
+		<h2>${{ monthlyRevenue[0]['sum(soldPrice)'] }}</h2>
 		<br>
 		<h1>Total Revenue for Last Year</h1>
-		<h2>${{ yearlyRevenue }}</h2>
+		<h2>${{ yearlyRevenue[0]['sum(soldPrice)'] }}</h2>
 	</body>
 </html>

@@ -4,10 +4,15 @@
 		<title>Top Destinations</title>
 	</head>
 	<body>
+		<a href="/">Go Back</a>
 		<h1>Top Destinations for Past 3 Months</h1>
-		<h2>${{ monthlyTopDest }}</h2>
+		{% for dest in monthlyTopDest %}
+			<h2>{{ dest['city'] }} </h2>
+		{% endfor %}
 		<br>
 		<h1>Top Destinations for Past Year</h1>
-		<h2>${{ yearlyTopDest }}</h2>
+		{% for dest in yearlyTopDest %}
+		<h2>{{ dest['city'] }} </h2>
+		{% endfor %}
 	</body>
 </html>
